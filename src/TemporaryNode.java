@@ -76,8 +76,8 @@ public class TemporaryNode implements TemporaryNodeInterface,Runnable {
                 outputStream.write(messageToSend);
                 System.out.println("Send connection request to: " + startingNodeAddress);
 
-                currentConnectionIP = aux[0];
-                currentConnectionPort = Integer.parseInt(aux[1]);
+                currentConnectionIP = ipAddress;
+                currentConnectionPort = port;
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -97,6 +97,8 @@ public class TemporaryNode implements TemporaryNodeInterface,Runnable {
                 String messageToSend2 = "START? 1  " + startingNodeName;
                 outputStream.write(messageToSend2);
                 System.out.println("Send connection request to: " + startingNodeAddress);
+                currentConnectionPort = port;
+                currentConnectionIP = ipAddress;
 
             }
             catch (IOException e)
@@ -116,20 +118,16 @@ public class TemporaryNode implements TemporaryNodeInterface,Runnable {
     }
 
     public boolean store(String key, String value) {
-        //Sends HashID of the name of the node to the fullnode
-        /*Socket clientSocket = null;
         try {
-            clientSocket = new Socket(ipAddress,port);
-            OutputStream outputStream = clientSocket.getOutputStream();
-            String protocol = "STORE 1";
+            OutputStreamWriter outputStream = new OutputStreamWriter(clientSocket.getOutputStream());
+            String protocol = "STORE? 1 ";
             String hashID =  key + value;
-            outputStream.write(protocol.getBytes());
-            outputStream.write(HashID.computeHashID(hashID));
-        } catch (Exception e) {
+            outputStream.write(protocol + hashID);
+        } catch (IOException e) {
             e.printStackTrace();
             return false;
         }
-*/
+
         // Implement this!
 	// Return true if the store worked
 	// Return false if the store failed
@@ -137,21 +135,23 @@ public class TemporaryNode implements TemporaryNodeInterface,Runnable {
     }
 
     public String get(String key) {
-        /*Socket clientSocket = null;
+        String message;
         try {
-            clientSocket = new Socket(ipAddress,port);
-            InputStream inputStream = clientSocket.getInputStream();
-            OutputStream outputStream = clientSocket.getOutputStream();
-            outputStream.write(key.getBytes());
-            byte[] dataToRead = inputStream.readAllBytes();
+            BufferedReader inputStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+            OutputStreamWriter outputStream = new OutputStreamWriter(clientSocket.getOutputStream());
+            outputStream.write("GET? " + key);
+            if((message = inputStream.readLine()) != null)
+            {
+                return message;
+            }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            return "Cannot connect to Server";
         }
-*/
         // Implement this!
 	// Return the string if the get worked
 	// Return null if it didn't
-	return "Not implemented";
+	return "GET? Did not return any String";
     }
 
     @Override
