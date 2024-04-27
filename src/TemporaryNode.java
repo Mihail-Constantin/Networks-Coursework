@@ -9,7 +9,6 @@
 
 import java.io.*;
 import java.net.Socket;
-import java.util.HashMap;
 
 // DO NOT EDIT starts
 interface TemporaryNodeInterface {
@@ -20,7 +19,7 @@ interface TemporaryNodeInterface {
 // DO NOT EDIT ends
 
 
-public class TemporaryNode implements TemporaryNodeInterface,Runnable {
+public class TemporaryNode implements TemporaryNodeInterface {
 
 
     private String ipAddress;
@@ -62,7 +61,7 @@ public class TemporaryNode implements TemporaryNodeInterface,Runnable {
         else
             return false;
 
-        if(port > 65535)
+        if(port > 65535 || port < 0)
             return false;
 
         //If there was no previous connection established we go in this side of the if
@@ -119,10 +118,14 @@ public class TemporaryNode implements TemporaryNodeInterface,Runnable {
 
     public boolean store(String key, String value) {
         try {
+            int keyLines, valueLines;
+            String[] aux = key.split(" ");
+            keyLines = aux.length;
+            aux = value.split(" ");
+            valueLines = aux.length;
             OutputStreamWriter outputStream = new OutputStreamWriter(clientSocket.getOutputStream());
-            String protocol = "STORE? 1 ";
-            String hashID =  key + value;
-            outputStream.write(protocol + hashID);
+            String protocol = "STORE?" + " " + keyLines + " " + valueLines;
+            outputStream.write(protocol + "\n" + key + "\n" + value);
         } catch (IOException e) {
             e.printStackTrace();
             return false;
@@ -135,11 +138,14 @@ public class TemporaryNode implements TemporaryNodeInterface,Runnable {
     }
 
     public String get(String key) {
+        int keyLines;
+        String[] aux = key.split(" ");
+        keyLines = aux.length;
         String message;
         try {
             BufferedReader inputStream = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             OutputStreamWriter outputStream = new OutputStreamWriter(clientSocket.getOutputStream());
-            outputStream.write("GET? " + key);
+            outputStream.write("GET? " + keyLines + "\n" + key);
             if((message = inputStream.readLine()) != null)
             {
                 return message;
@@ -154,8 +160,4 @@ public class TemporaryNode implements TemporaryNodeInterface,Runnable {
 	return "GET? Did not return any String";
     }
 
-    @Override
-    public void run() {
-
-    }
 }
