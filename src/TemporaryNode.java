@@ -31,6 +31,8 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
     private int currentConnectionPort;
 
+    private String connectedNodeName;
+
     public boolean start(String startingNodeName, String startingNodeAddress) {
 
         Writer outputStream;
@@ -77,6 +79,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
 
                 currentConnectionIP = ipAddress;
                 currentConnectionPort = port;
+                connectedNodeName = startingNodeName;
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -87,6 +90,7 @@ public class TemporaryNode implements TemporaryNodeInterface {
         {
             try{
                 outputStream = new OutputStreamWriter(clientSocket.getOutputStream());
+                String connectedNodeAddress = currentConnectionIP + ":" + currentConnectionPort;
                 String messageToSend = "NOTIFY?" + "\n" + startingNodeName +  "\n" + startingNodeAddress;
                 outputStream.write(messageToSend);
                 System.out.println("Current node NOTIFIED of new node");
@@ -96,8 +100,13 @@ public class TemporaryNode implements TemporaryNodeInterface {
                 String messageToSend2 = "START? 1  " + startingNodeName;
                 outputStream.write(messageToSend2);
                 System.out.println("Send connection request to: " + startingNodeAddress);
+
+                messageToSend = "NOTIFY?" + "\n" + connectedNodeName +  "\n" + connectedNodeAddress;
+                outputStream.write(messageToSend);
+
                 currentConnectionPort = port;
                 currentConnectionIP = ipAddress;
+                connectedNodeName = startingNodeName;
 
             }
             catch (IOException e)
